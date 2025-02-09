@@ -1,20 +1,29 @@
 import React, {useState} from 'react';
+import {useNavigate} from "react-router-dom";
 import Input from "./Input";
 import Button from "./Button";
+import {BE_signIn, BE_signUp} from "../Backend/Quaries";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "../Redux/store";
+import {authDataType} from "../Types";
 
 export default function Login() {
     const [login, setLogin] = useState(true)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [signUpLoading, setSignUpLoading] = useState(false)
+    const [signInLoading, setSignInLoading] = useState(false)
+    const goTo = useNavigate()
+    const dispatch = useDispatch<AppDispatch>()
 
-    const handleSignin = () => {
+    const handleSignIn = () => {
         const data = {
             email,
             password
         }
 
-        console.log(data)
+        auth(data, BE_signIn, setSignInLoading)
     }
 
     const handleSignup = () => {
@@ -24,8 +33,23 @@ export default function Login() {
             confirmPassword
         }
 
-        console.log(data)
+        auth(data, BE_signUp, setSignUpLoading)
     }
+
+    const auth = (
+        data: authDataType,
+        func: any,
+        setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    ) => {
+        func(data, setLoading, reset, goTo, dispatch)
+    }
+
+    const reset = () => {
+        setEmail("")
+        setPassword("")
+        setConfirmPassword("")
+    }
+
   return (
       <div className="w-full md:w-[450px]">
           <h1 className="text-white text-center font-bold text-4xl md:text-6xl mb-10">
@@ -36,10 +60,10 @@ export default function Login() {
               <Input name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
               {!login && <Input name="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>}
               {login ? (<>
-                  <Button text="Login" onClick={handleSignin}/>
+                  <Button text="Login" onClick={handleSignIn} loading={signInLoading}/>
                   <Button onClick={() => setLogin(false)} text="Register" secondary/>
               </>): (<>
-                  <Button text="Register" onClick={handleSignup} secondary/>
+                  <Button text="Register" onClick={handleSignup} loading={signUpLoading} secondary/>
                   <Button onClick={() => setLogin(true)} text="Login"/>
               </>)}
           </div>
