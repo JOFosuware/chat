@@ -9,7 +9,7 @@ type ButtonProps = {
     loading?: boolean
 }
 
-export default function ({
+export default function Button ({
     text = "Button",
     className,
     secondary,
